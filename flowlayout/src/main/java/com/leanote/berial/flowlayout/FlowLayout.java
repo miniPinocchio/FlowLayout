@@ -8,8 +8,7 @@ import android.view.ViewGroup;
 
 /**
  * 流式布局
- *
- * @author berial
+ * Created by berial on 15/9/25.
  */
 public class FlowLayout extends ViewGroup {
 
