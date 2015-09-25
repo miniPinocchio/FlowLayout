@@ -8,17 +8,21 @@ import android.view.ViewGroup;
 
 /**
  * 流式布局
- * Created by berial on 15/9/24.
+ * @author berial
  */
 public class FlowLayout extends ViewGroup {
+
 	private static final int DEFAULT_HORIZONTAL_SPACING = 5;
 	private static final int DEFAULT_VERTICAL_SPACING = 5;
 
+	//两个子View的垂直间距
 	private int mVerticalSpacing;
+
+	//两个子View的水平间距
 	private int mHorizontalSpacing;
 
 	public FlowLayout(Context context) {
-		super(context);
+		this(context, null);
 	}
 
 	public FlowLayout(Context context, AttributeSet attrs) {
@@ -35,11 +39,18 @@ public class FlowLayout extends ViewGroup {
 		}
 	}
 
-
+	/**
+	 * 设置水平间距
+	 * @param pixelSize 水平间距px值
+	 */
 	public void setHorizontalSpacing(int pixelSize) {
 		mHorizontalSpacing = pixelSize;
 	}
 
+	/**
+	 * 设置垂直间距
+	 * @param pixelSize 垂直间距px值
+	 */
 	public void setVerticalSpacing(int pixelSize) {
 		mVerticalSpacing = pixelSize;
 	}
@@ -60,6 +71,7 @@ public class FlowLayout extends ViewGroup {
 
 		// Measure each child and put the child to the right of previous child
 		// if there's enough room for it, otherwise, wrap the line and put the child to next line.
+		//测量每一个子控件，如果当前行有足够的控件，会把当前子控件放到上一个子控件的右方，否则会放到下一行。
 		for(int i = 0, childCount = getChildCount(); i < childCount; ++i) {
 			View child = getChildAt(i);
 			measureChild(child, widthMeasureSpec, heightMeasureSpec);
@@ -67,7 +79,7 @@ public class FlowLayout extends ViewGroup {
 			int childWidth = child.getMeasuredWidth();
 			int childHeight = child.getMeasuredHeight();
 
-			lineHeight = Math.max(childHeight, lineHeight);
+			lineHeight = Math.max(childHeight, lineHeight);//行高为当前行所有控件中的最大值
 
 			if(childLeft + childWidth + paddingRight > myWidth) {
 				childLeft = paddingLeft;
