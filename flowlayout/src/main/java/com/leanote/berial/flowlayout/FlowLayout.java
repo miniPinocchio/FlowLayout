@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 /**
  * 流式布局
+ *
  * @author berial
  */
 public class FlowLayout extends ViewGroup {
@@ -41,6 +42,7 @@ public class FlowLayout extends ViewGroup {
 
 	/**
 	 * 设置水平间距
+	 *
 	 * @param pixelSize 水平间距px值
 	 */
 	public void setHorizontalSpacing(int pixelSize) {
@@ -49,6 +51,7 @@ public class FlowLayout extends ViewGroup {
 
 	/**
 	 * 设置垂直间距
+	 *
 	 * @param pixelSize 垂直间距px值
 	 */
 	public void setVerticalSpacing(int pixelSize) {
@@ -57,7 +60,7 @@ public class FlowLayout extends ViewGroup {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		int myWidth = resolveSize(0, widthMeasureSpec);
+		int layoutWidth = resolveSize(0, widthMeasureSpec);//当前FlowLayout的宽度
 
 		int paddingLeft = getPaddingLeft();
 		int paddingTop = getPaddingTop();
@@ -69,8 +72,6 @@ public class FlowLayout extends ViewGroup {
 
 		int lineHeight = 0;
 
-		// Measure each child and put the child to the right of previous child
-		// if there's enough room for it, otherwise, wrap the line and put the child to next line.
 		//测量每一个子控件，如果当前行有足够的控件，会把当前子控件放到上一个子控件的右方，否则会放到下一行。
 		for(int i = 0, childCount = getChildCount(); i < childCount; ++i) {
 			View child = getChildAt(i);
@@ -81,7 +82,7 @@ public class FlowLayout extends ViewGroup {
 
 			lineHeight = Math.max(childHeight, lineHeight);//行高为当前行所有控件中的最大值
 
-			if(childLeft + childWidth + paddingRight > myWidth) {
+			if(childLeft + childWidth + paddingRight > layoutWidth) { //换行
 				childLeft = paddingLeft;
 				childTop += mVerticalSpacing + lineHeight;
 				lineHeight = childHeight;
@@ -92,12 +93,12 @@ public class FlowLayout extends ViewGroup {
 
 		int wantedHeight = childTop + lineHeight + paddingBottom;
 
-		setMeasuredDimension(myWidth, resolveSize(wantedHeight, heightMeasureSpec));
+		setMeasuredDimension(layoutWidth, resolveSize(wantedHeight, heightMeasureSpec));
 	}
 
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		int myWidth = r - l;
+		int layoutWidth = r - l;
 
 		int paddingLeft = getPaddingLeft();
 		int paddingTop = getPaddingTop();
@@ -111,23 +112,21 @@ public class FlowLayout extends ViewGroup {
 		for(int i = 0, childCount = getChildCount(); i < childCount; ++i) {
 			View childView = getChildAt(i);
 
-			if(childView.getVisibility() == View.GONE) {
-				continue;
+			if(childView.getVisibility() != View.GONE) {
+				int childWidth = childView.getMeasuredWidth();
+				int childHeight = childView.getMeasuredHeight();
+
+				lineHeight = Math.max(childHeight, lineHeight);
+
+				if(childLeft + childWidth + paddingRight > layoutWidth) {
+					childLeft = paddingLeft;
+					childTop += mVerticalSpacing + lineHeight;
+					lineHeight = childHeight;
+				}
+
+				childView.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight);
+				childLeft += childWidth + mHorizontalSpacing;
 			}
-
-			int childWidth = childView.getMeasuredWidth();
-			int childHeight = childView.getMeasuredHeight();
-
-			lineHeight = Math.max(childHeight, lineHeight);
-
-			if(childLeft + childWidth + paddingRight > myWidth) {
-				childLeft = paddingLeft;
-				childTop += mVerticalSpacing + lineHeight;
-				lineHeight = childHeight;
-			}
-
-			childView.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight);
-			childLeft += childWidth + mHorizontalSpacing;
 		}
 	}
 }
